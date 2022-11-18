@@ -24,11 +24,12 @@ func main() {
 	<-block
 }
 
-func req(client *http.Client, url string, prefix string) {
+func req(client *http.Client, url string, prefix string, errors *int) {
 	resp, err := client.Get(url)
 	t := time.Now().UTC()
 	if err != nil {
-		fmt.Println(t, prefix, err)
+		*errors = *errors + 1
+		fmt.Println(t, prefix, err, *errors)
 		return
 	}
 	text, _ := io.ReadAll(resp.Body)
@@ -38,12 +39,13 @@ func req(client *http.Client, url string, prefix string) {
 
 func newConn(url string) {
 	var transport *http.Transport
+	errors := 0
 
 	for {
 		time.Sleep(1 * time.Second)
 		transport = &http.Transport{}
 		client := &http.Client{Transport: transport}
-		req(client, url, "newConn")
+		req(client, url, "newConn", &errors)
 		transport.CloseIdleConnections()
 	}
 
@@ -55,10 +57,11 @@ func reuseConn(url string) {
 		MaxConnsPerHost: 1,
 	}
 	client := &http.Client{Transport: transport}
+	errors := 0
 
 	for {
 		time.Sleep(1 * time.Second)
-		req(client, url, "oldConn")
+		req(client, url, "oldConn", &errors)
 	}
 
 }
