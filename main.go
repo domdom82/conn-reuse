@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"time"
@@ -28,8 +29,10 @@ func req(client *http.Client, url string, prefix string) {
 	t := time.Now().UTC()
 	if err != nil {
 		fmt.Println(t, prefix, err)
+		return
 	}
-	fmt.Println(t, prefix, resp.Status)
+	text, _ := io.ReadAll(resp.Body)
+	fmt.Println(t, prefix, resp.Status, string(text))
 	resp.Body.Close()
 }
 
