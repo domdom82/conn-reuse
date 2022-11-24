@@ -15,3 +15,5 @@
 # vendor/
 .idea
 conn-reuse
+oldConn.keylog
+newConn.keylog
